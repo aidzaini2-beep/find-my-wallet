@@ -1,0 +1,50 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find My Wallet | Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    form {
+      background: white;
+      padding: 28px;
+      border-radius: 16px;
+      width: min(320px, 80vw);
+      box-shadow: 0 8px 30px #0001;
+    }
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+    }
+    button {
+      background: #172554;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .error { color: #b91c1c; }
+  </style>
+</head>
+<body>
+  <form method="post">
+    <h2>Find My Wallet</h2>
+    <p>Enter your owner PIN to view your wallet.</p>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <input name="pin" type="password" placeholder="Owner PIN"
+           required>
+    <button type="submit">View wallet</button>
+  </form>
+</body>
+</html>

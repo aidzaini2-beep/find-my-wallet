@@ -1,0 +1,92 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find My Wallet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    header { padding: 20px; }
+    main { padding: 0 20px 20px; }
+    #map {
+      height: 55vh;
+      min-height: 300px;
+      border-radius: 14px;
+    }
+    .status {
+      background: white;
+      padding: 16px;
+      margin-bottom: 14px;
+      border-radius: 12px;
+    }
+    a { color: #1d4ed8; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Find My Wallet</h1>
+    <p>Wallet ID: {{ wallet_id }}</p>
+    <a href="/logout">Log out</a>
+  </header>
+
+  <main>
+    <div class="status">
+      <strong id="status">Loading location…</strong>
+      <p id="coordinates">Waiting for coordinates</p>
+      <p><small>Demo coordinates are not a live tracker location.</small></p>
+    </div>
+    <div id="map"></div>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const walletId = {{ wallet_id | tojson }};
+    const map = L.map("map").setView([3.1390, 101.6869], 15);
+
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const marker = L.marker([3.1390, 101.6869]).addTo(map);
+
+    async function updateLocation() {
+      try {
+        const response = await fetch(
+          `/api/location/${encodeURIComponent(walletId)}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Could not load location. Please log in again.");
+        }
+
+        const data = await response.json();
+        const point = [data.lat, data.lon];
+
+        marker.setLatLng(point);
+        map.setView(point, 16);
+
+        document.getElementById("coordinates").textContent =
+          `Latitude: ${data.lat}, Longitude: ${data.lon}`;
+
+        document.getElementById("status").textContent =
+          `Last update: ${data.updated}`;
+      } catch (error) {
+        document.getElementById("status").textContent = error.message;
+      }
+    }
+
+    updateLocation();
+    setInterval(updateLocation, 10000);
+  </script>
+</body>
+</html>
