@@ -175,6 +175,11 @@ def location_api(wallet_id):
 
     return jsonify({"status": "updated"})
 
+@app.route("/")
+def home():
+    if pin_exists():
+        return redirect(url_for("login"))
+    return redirect(url_for("setup"))
 
 if __name__ == "__main__":
     app.run(debug=True)
